@@ -9,6 +9,7 @@
 # - L1 energy sums ((awkward array of pt, eta, phi and more))
 # - L1 bits of cutbased triggers, and total L1 bit (pandas dataframe)
 # all of these should have then same length!
+# maybe we should store the output in a dict to make everything a bit less lengthy
 
 # I created two functions for h5s, as the signal one contains multiple signals that we (might) want to load individually
 

@@ -29,13 +29,77 @@ def readFromAnomalySignalh5(inputfile):
     raise Exception("readFromAnomalySignalh5 is not implemented yet!")
 
 
-def readFromAnomalyBackgroundh5(inputfile, verbosity = 0):
-    # I quickly tried to implement this, but:
-    # the anomaly h5 files are numpy array, that are 0-padded
-    # doing the step numpy -> awkward and removing "empty" particles is surprisingly difficult
-    # if anyone has an idea - please implement :)
+def readFromAnomalyBackgroundh5(inputfile, moreInfo=None, verbosity = 0):
     
-    raise Exception("readFromAnomalyBackgroundh5 is not implemented yet!")
+    if(verbosity > 0): print("Reading anomaly team preprocessed file at " + inputfile + ".")
+        
+    # constructing the information dict
+    # some things will be automatically filled here
+    # the input "moreInfo" can be used to pass more information
+    # this information will have priority over automatically set entries
+    infoDict = {}
+    infoDict["input"] = inputfile
+    
+    # preparing lists to store L1 bit info
+    L1bits_labels = []
+    L1bits = []
+
+    # reading the intput file
+    if(verbosity > 0): print("Starting to read input file...")
+    with h5py.File(inputfile, 'r') as h5f2:
+
+        for key in h5f2.keys():
+
+            if key[:3] == "L1_":
+                L1bits_labels.append(key)
+                L1bits.append(np.array(h5f2[key]))
+            elif key == "L1bit":
+                L1bit = np.array(h5f2[key])
+
+            if len(h5f2[key].shape) < 3: continue
+            if key == "full_data_cyl":
+                data = h5f2[key][:,:,:]
+
+    # we have 57 variables, but they do not have labels yet. Lets assign them based on the info in
+    # https://gitlab.cern.ch/cms-l1-ad/l1_anomaly_ae/-/blob/master/in/prep_data.py
+    # I assume that we have MET, 4 electrons, 4 muons and 10 jets
+    # These are 19 objects, times 3 parameters -> 57 vars
+    # From line 27 I think the order is as I listed it: MET, egammas, muons, jets
+        
+    # splitting objects
+    np_energysums = data[:,0,:].reshape( (data.shape[0], 1, 3) ) # reshape is needed to keep dimensionality
+    np_egammas = data[:,1:4,:]
+    np_muons = data[:,5:8,:]
+    np_jets = data[:,9:19,:]
+    
+    # converting to awkward (thanks Artur for the code)
+    ak_egammas = ak.zip( {key:ak.from_regular(np_egammas[:,:,i], axis = 1) for i,key in enumerate(["pt","eta","phi"])}, with_name = "Momentum4D")
+    ak_muons = ak.zip( {key:ak.from_regular(np_muons[:,:,i], axis = 1) for i,key in enumerate(["pt","eta","phi"])}, with_name = "Momentum4D")
+    ak_jets = ak.zip( {key:ak.from_regular(np_jets[:,:,i], axis = 1) for i,key in enumerate(["pt","eta","phi"])}, with_name = "Momentum4D")
+    
+    # energy sums are handled a bit differently
+    ak_energysums = ak.zip( {key:ak.from_regular(np_energysums[:,:,2*i], axis = 1) for i, key in enumerate(["pt","phi"])}, with_name = "Momentum4D")
+    ak_energysums["Type"] = [2] * len(ak_energysums) # MET should have Type 2
+    
+    # removing empty entries (not needed for energy sums)
+    ak_egammas = ak_egammas[ak_egammas.pt > 0]
+    ak_muons = ak_muons[ak_muons.pt > 0]
+    ak_jets = ak_jets[ak_jets.pt > 0]
+    
+    infoDict["nEvents"] = len(ak_muons)
+    
+    # formating the L1 bits
+    df_total_L1 = pd.DataFrame( {"total L1": L1bit} )
+    df_trigger_bits = pd.DataFrame(np.asarray(L1bits).T, columns=L1bits_labels)
+    df_bits = df_total_L1.join(df_trigger_bits)
+    
+    # after everything else: add moreInfo
+    if moreInfo: infoDict = {**infoDict, **moreInfo}
+        
+    if(verbosity > 0): print("Done!")
+    
+    return infoDict, ak_muons, ak_egammas, ak_jets, ak_energysums, df_bits
+    
 
 
 def readFromL1Ntuple(inputpath, prescale_file_name, eventTree="l1UpgradeEmuTree/L1UpgradeTree", L1bitTree="l1uGTTree/L1uGTTree", moreInfo=None, verbosity=0):

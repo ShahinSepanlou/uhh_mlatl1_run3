@@ -24,3 +24,14 @@ Using the preprocessed data, the inference can be run. Assuming that the input d
 
 #### Result comparison
 Network outputs interpretation and all plotting happens here. Assuming that we only have models that output a single variable that we cut on (output score or loss), this can be rather generic as well.
+
+
+### MISC
+For later reference: these are the energy sum labels:
+
+| type | ID |
+| kTotalEt | 0 |
+| kTotalEtEm | 16 |
+| kTotalHt | 1 |
+| kMissingEt | 2 |
+| kMissingHt | 3 |

@@ -52,7 +52,7 @@ def readFromAnomalySignalh5(inputfile, process, moreInfo=None, verbosity = 0):
 
             # doing this should remove all trigger things, and leave a single entry with the data
             if len(h5f2[key].shape) < 3: continue
-            if key == process: data = h5f2[key][:,:,:]
+            if key == process: data = h5f2[key][:,:,:].astype("float")
     
     # splitting objects
     np_energysums = data[:,0,:].reshape( (data.shape[0], 1, 3) ) # reshape is needed to keep dimensionality
@@ -125,7 +125,7 @@ def readFromAnomalyBackgroundh5(inputfile, moreInfo=None, verbosity = 0):
 
             if len(h5f2[key].shape) < 3: continue
             if key == "full_data_cyl":
-                data = h5f2[key][:,:,:]
+                data = h5f2[key][:,:,:].astype("float")
 
     # we have 57 variables, but they do not have labels yet. Lets assign them based on the info in
     # https://gitlab.cern.ch/cms-l1-ad/l1_anomaly_ae/-/blob/master/in/prep_data.py

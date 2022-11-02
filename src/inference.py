@@ -1,11 +1,20 @@
-# Function to run the inference on the test dataset
+import keras
 
-def runInference(model_path, x_test, y_test):
+# Function to run the inference on the dataset
+
+def runInference(model_file, x, verbosity = 0):
     # Expected input:
     # - path to the model file
     # - everything from preparedata
     #
     # Expected output:
     # - output scores (numpy array)
+    
+    if(verbosity > 0): print("Loading model from " + str(model_file) + "...")
+    model = keras.models.load_model(model_file)
 
-    raise runInference("readFromAnomalyBackgroundh5 is not implemented yet!")
+    if(verbosity > 0): print("Starting inference...")
+        
+    y_pred = model.predict(x)
+    
+    return y_pred

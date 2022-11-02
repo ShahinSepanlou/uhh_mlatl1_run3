@@ -117,7 +117,8 @@ def prepareDataTopotrigger(model_dir, data, verbosity = 0):
     x_test_scaled = []
     for scaler in scalers: x_test_scaled.append( scaler.transform(x_test) )
     
-    return x_test_scaled, y_test
+    # only returning the first one for the moment, need to have discussion on kFold later
+    return x_test_scaled[0], y_test
 
 
 def prepareDataAnomaly(model_dir, data):

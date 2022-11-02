@@ -85,8 +85,15 @@ def readFromAnomalySignalh5(inputfile, process, moreInfo=None, verbosity = 0):
     if moreInfo: infoDict = {**infoDict, **moreInfo}
         
     if(verbosity > 0): print("Done!")
+        
+    # we'll output the data as a dict, makes it easier later
+    dataDict = {}
+    dataDict["muons"] = ak_muons
+    dataDict["egammas"] = ak_egammas
+    dataDict["jets"] = ak_jets
+    dataDict["energysums"] = ak_energysums
     
-    return infoDict, ak_muons, ak_egammas, ak_jets, ak_energysums, df_bits
+    return infoDict, dataDict, df_bits
 
 
 def readFromAnomalyBackgroundh5(inputfile, moreInfo=None, verbosity = 0):
@@ -157,8 +164,15 @@ def readFromAnomalyBackgroundh5(inputfile, moreInfo=None, verbosity = 0):
     if moreInfo: infoDict = {**infoDict, **moreInfo}
         
     if(verbosity > 0): print("Done!")
+        
+    # we'll output the data as a dict, makes it easier later
+    dataDict = {}
+    dataDict["muons"] = ak_muons
+    dataDict["egammas"] = ak_egammas
+    dataDict["jets"] = ak_jets
+    dataDict["energysums"] = ak_energysums
     
-    return infoDict, ak_muons, ak_egammas, ak_jets, ak_energysums, df_bits
+    return infoDict, dataDict, df_bits
     
 
 
@@ -254,8 +268,15 @@ def readFromL1Ntuple(inputpath, prescale_file_name, eventTree="l1UpgradeEmuTree/
     if moreInfo: infoDict = {**infoDict, **moreInfo}
         
     if(verbosity > 0): print("Done!")
+        
+    # we'll output the data as a dict, makes it easier later
+    dataDict = {}
+    dataDict["muons"] = muons
+    dataDict["egammas"] = egammas
+    dataDict["jets"] = jets
+    dataDict["energysums"] = energysums
     
-    return infoDict, muons, egammas, jets, energysums, bits
+    return infoDict, dataDict, bits
 
 
 def readFromNanoAOD(inputpath):

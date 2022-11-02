@@ -12,7 +12,6 @@ def prepareData(model_dir, data, verbosity=0):
     #
     # Expected output:
     # - NN input variables (x_test), numpy array
-    # - Labels (y_test), numpy array
 
     # Implementation: determine from the info in model_dir what kind of model is needed
     # Then call one of the specialized functions from below
@@ -64,14 +63,9 @@ def prepareDataTopotrigger(model_dir, data, verbosity = 0):
     
     # the implementation for the topo trigger expects up to two dicts of ak arrays
     # containing the following keys: energysums, muons, egammas, jets
-    # if multiple dicts are passed, they are contained in a dict labelling "signal" or "background"
     
     # in the model_dir, multiple model files is expected (names: model_foldX.h5)
     # each model has a scaler: scaler_foldX.pkl
-    
-    # check whether any data is passed
-    if not "signal" in data and not "background" in data:
-        raise Exception("Please pass at least one of signal or background data!")
     
     # the info dict will be used to store some more info on the desired input variables
     with open(model_dir+'network_info.pkl', 'rb') as f:
@@ -79,46 +73,21 @@ def prepareDataTopotrigger(model_dir, data, verbosity = 0):
     
     # important! topo trigger networks will always used the following order of inputs:
     # energy sums, jets, muons, egammas
-    
-    x_tests = []
-    y_tests = []
-    
-    if "signal" in data:
-        if(verbosity > 0): print("Working on signal data...")
-        data_signal = data["signal"]
-        
-        # creating the x_test according to the info stored in the infoDict
-        x_data = formatDataTopotrigger(infoDict, data_signal, verbosity = verbosity)
-        x_tests.append( x_data )
-        
-        # creating the needed part of y_test
-        y_tests.append( np.ones( x_data.shape[0] ) )
-        
-    if "background" in data:
-        if(verbosity > 0): print("Working on background data...")
-        data_background = data["background"]
-        
-        # creating the x_test according to the info stored in the infoDict
-        x_data = formatDataTopotrigger(infoDict, data_background, verbosity = verbosity)
-        x_tests.append( x_data )
-        
-        # creating the needed part of y_test
-        y_tests.append( np.zeros( x_data.shape[0] ) )
-        
-    x_test = np.concatenate(x_tests)
-    y_test = np.concatenate(y_tests)
-    
+
+    # creating the x_test according to the info stored in the infoDict
+    x = formatDataTopotrigger(infoDict, data, verbosity = verbosity)
+            
     # finally, apply the StandardScaler to the test dataset
     # first, load the scalers. We'll determine the number of scalers from the infoDics
     scalers = []
     for i in range(infoDict["folds"]):
         with open(model_dir + "/scaler_fold" + str(i) + ".pkl", 'rb') as inp: scalers.append( pickle.load(inp) )
      
-    x_test_scaled = []
-    for scaler in scalers: x_test_scaled.append( scaler.transform(x_test) )
+    x_scaled = []
+    for scaler in scalers: x_scaled.append( scaler.transform(x) )
     
     # only returning the first one for the moment, need to have discussion on kFold later
-    return x_test_scaled[0], y_test
+    return x_scaled[0]
 
 
 def prepareDataAnomaly(model_dir, data):

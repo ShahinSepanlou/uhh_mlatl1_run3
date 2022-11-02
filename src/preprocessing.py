@@ -103,7 +103,7 @@ def prepareDataTopotrigger(model_dir, data, verbosity = 0):
         x_tests.append( x_data )
         
         # creating the needed part of y_test
-        y_tests.append( np.zeroes( x_data.shape[0] ) )
+        y_tests.append( np.zeros( x_data.shape[0] ) )
         
     x_test = np.concatenate(x_tests)
     y_test = np.concatenate(y_tests)

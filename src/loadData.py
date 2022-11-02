@@ -224,7 +224,7 @@ def readFromL1Ntuple(inputpath, prescale_file_name, eventTree="l1UpgradeEmuTree/
         
     # using Momentum4D to get pt, eta and phi
     muons = ak.zip({key.replace("muon","").replace("Eta","eta").replace("Phi","phi").replace("Et","pt"):muons[key] for key in muons.fields}, with_name = "Momentum4D")
-    egammas = ak.zip({key.replace("egammas","").replace("Eta","eta").replace("Phi","phi").replace("Et","pt"):egammas[key] for key in egammas.fields}, with_name = "Momentum4D")
+    egammas = ak.zip({key.replace("eg","").replace("Eta","eta").replace("Phi","phi").replace("Et","pt"):egammas[key] for key in egammas.fields}, with_name = "Momentum4D")
     jets = ak.zip({key.replace("jet","").replace("Eta","eta").replace("Phi","phi").replace("Et","pt"):jets[key] for key in jets.fields}, with_name = "Momentum4D")
     energysums = ak.zip({key.replace("sum","").replace("Phi","phi").replace("Et","pt"):energysums[key] for key in energysums.fields})
     

@@ -108,7 +108,16 @@ def prepareDataTopotrigger(model_dir, data, verbosity = 0):
     x_test = np.concatenate(x_tests)
     y_test = np.concatenate(y_tests)
     
-    return x_test, y_test
+    # finally, apply the StandardScaler to the test dataset
+    # first, load the scalers. We'll determine the number of scalers from the infoDics
+    scalers = []
+    for i in range(infoDict["folds"]):
+        with open(model_dir + "/scaler_fold" + str(i) + ".pkl", 'rb') as inp: scalers.append( pickle.load(inp) )
+     
+    x_test_scaled = []
+    for scaler in scalers: x_test_scaled.append( scaler.transform(x_test) )
+    
+    return x_test_scaled, y_test
 
 
 def prepareDataAnomaly(model_dir, data):

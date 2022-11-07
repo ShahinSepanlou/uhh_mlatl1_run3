@@ -5,7 +5,7 @@ import pickle
 # Functions for data preprocessing.
 # prepareData is the main function, which determines from the passed model what kind of preparation is needed
 
-def prepareData(model_dir, data, verbosity=0):
+def prepareData(model_dir, data, verbosity = 0):
     # Expected input:
     # - a model. I would propose just passing a path to a directory containing all info
     # - data_*: this can be anything the concrete method needs, stored in a dict (or list, or array...)
@@ -35,7 +35,7 @@ def awkward_to_numpy(ak_array, maxN):
     np_arr = np.stack( (selected_arr.pt.to_numpy(), selected_arr.eta.to_numpy(), selected_arr.phi.to_numpy()), axis=2)
     return np_arr.reshape(np_arr.shape[0], np_arr.shape[1] * np_arr.shape[2])
 
-def formatDataTopotrigger(infoDict, data, verbosity=0):
+def formatDataTopotrigger(infoDict, data, verbosity = 0):
     # a helper function for the topo trigger that x_test outputs data in the desired format
     
     if(verbosity > 1): print("Formating data for topo trigger usage...")
@@ -48,7 +48,6 @@ def formatDataTopotrigger(infoDict, data, verbosity=0):
     # first, lets get MET and MET phi
     np_MET = np.asarray( ak.to_numpy( energysums[energysums.Type == 2].pt).flatten() ).reshape( (len(energysums), 1) )
     np_MET_phi = np.asarray( ak.to_numpy(energysums[energysums.Type == 2].phi).flatten() ).reshape( (len(energysums), 1) )
-    
     
     # now, lets add particles based on the info in the infoDict
     np_jets = awkward_to_numpy(jets, infoDict["nJets"])

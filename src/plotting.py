@@ -36,3 +36,33 @@ def plotSculpting(data, triggerBit):
     hep.histplot(after_hist, bins)
     
     plt.yscale("log")
+    
+def plot_hist(data, ax = None, bins = 10, interval = None, logy = False, logx = False,
+              info = None, density = False, leading = False):
+## Die Funktion kann Histogramme plotten wo eigenes Binning und Density angegeben werden kann. 
+## Ausserdem koennen mehrere Plots in eine Figure gemacht werden und die Achsen logarithmisch gemacht werden
+    if ax == None:
+        fig, ax = plt.subplots()
+        print("new axis is defined")
+    if info == None:
+        info = {"input" : "There is no further Information"}
+    
+    #Converts Awkward Array to Numpy Array
+    new_data = ak.flatten(data).to_numpy()
+    
+    #Suche nur die Leading Teilchen raus
+    if leading == True:    
+        newer_data = []
+        for i in data:
+            newer_data.append(ak.max(i)) 
+        new_data = [i for i in newer_data if i is not None]
+    
+    #Create a Histogram
+    hist, hist_edges = np.histogram(new_data, bins, interval, density = density)
+    
+    #plot Histogram
+    hep.histplot(hist,hist_edges,ax = ax, label = str(info["input"]))
+    if logy == True:
+        plt.yscale("log")
+    if logx == True:
+        plt.xscale("log")
